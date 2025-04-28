@@ -2,7 +2,6 @@ package org.unicode.cldr.web;
 
 import static org.unicode.cldr.web.XPathTable.getStringIDString;
 
-import com.ibm.icu.dev.util.ElapsedTimer;
 import com.ibm.icu.text.UnicodeSet;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,27 +26,43 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.unicode.cldr.icu.LDMLConstants;
+import org.unicode.cldr.icu.dev.util.ElapsedTimer;
 import org.unicode.cldr.test.CheckCLDR;
 import org.unicode.cldr.test.CheckCLDR.CheckStatus;
 import org.unicode.cldr.test.CheckForCopy;
 import org.unicode.cldr.test.DisplayAndInputProcessor;
 import org.unicode.cldr.test.SubmissionLocales;
 import org.unicode.cldr.test.TestCache;
-import org.unicode.cldr.util.*;
+import org.unicode.cldr.util.CLDRConfig;
+import org.unicode.cldr.util.CLDRConfigImpl;
+import org.unicode.cldr.util.CLDRFile;
 import org.unicode.cldr.util.CLDRInfo.CandidateInfo;
 import org.unicode.cldr.util.CLDRInfo.UserInfo;
+import org.unicode.cldr.util.CLDRLocale;
+import org.unicode.cldr.util.CldrUtility;
+import org.unicode.cldr.util.CoverageInfo;
+import org.unicode.cldr.util.DateTimeFormats;
+import org.unicode.cldr.util.DowngradePaths;
 import org.unicode.cldr.util.DtdData.IllegalByDtdException;
+import org.unicode.cldr.util.Factory;
+import org.unicode.cldr.util.PathHeader;
+import org.unicode.cldr.util.SpecialLocales;
+import org.unicode.cldr.util.SupplementalDataInfo;
+import org.unicode.cldr.util.VoteType;
 import org.unicode.cldr.util.VoterReportStatus.ReportId;
+import org.unicode.cldr.util.XMLSource;
+import org.unicode.cldr.util.XMLUploader;
+import org.unicode.cldr.util.XPathParts;
 import org.unicode.cldr.web.BallotBox.InvalidXPathException;
 import org.unicode.cldr.web.BallotBox.VoteNotAcceptedException;
 import org.unicode.cldr.web.CLDRProgressIndicator.CLDRProgressTask;
 import org.unicode.cldr.web.SurveyException.ErrorCode;
 import org.unicode.cldr.web.UserRegistry.User;
 import org.unicode.cldr.web.WebContext.HTMLDirection;
+import org.unicode.cldr.web.util.JSONArray;
+import org.unicode.cldr.web.util.JSONException;
+import org.unicode.cldr.web.util.JSONObject;
 
 /**
  * Servlet implementation class SurveyAjax
@@ -207,7 +222,7 @@ public class SurveyAjax extends HttpServlet {
             } else if (what.equals(WHAT_FLAGGED)) {
                 SurveyJSONWrapper r = newJSONStatus(request, sm);
                 mySession = CookieSession.retrieve(sess);
-                new SurveyFlaggedItems(UserRegistry.userIsTC(mySession.user)).getJson(r);
+                new SurveyFlaggedItems(UserRegistry.userIsTCOrStronger(mySession.user)).getJson(r);
                 send(r, out);
             } else if (what.equals(WHAT_STATS_BYDAYUSERLOC)) {
                 String votesAfterString = SurveyMain.getVotesAfterString();
@@ -610,7 +625,7 @@ public class SurveyAjax extends HttpServlet {
                              */
                             if (mySession.user != null
                                     && mySession.user.canImportOldVotes()
-                                    && !UserRegistry.userIsTC(mySession.user)
+                                    && !UserRegistry.userIsTCOrStronger(mySession.user)
                                     && !alreadyAutoImportedVotes(mySession.user.id, "ask")) {
                                 r.put("canAutoImport", "true");
                             }
@@ -707,7 +722,7 @@ public class SurveyAjax extends HttpServlet {
                                     if (them != null
                                             && ((them.id == mySession.user.id)
                                                     || // it's me
-                                                    UserRegistry.userIsTC(mySession.user)
+                                                    UserRegistry.userIsTCOrStronger(mySession.user)
                                                     || (UserRegistry.userIsExactlyManager(
                                                                     mySession.user)
                                                             && (them.getOrganization()
@@ -877,7 +892,7 @@ public class SurveyAjax extends HttpServlet {
      * @throws SurveyException
      */
     public void assertIsTC(CookieSession mySession) throws SurveyException {
-        if (!UserRegistry.userIsTC(mySession.user)) {
+        if (!UserRegistry.userIsTCOrStronger(mySession.user)) {
             throw new SurveyException(ErrorCode.E_NO_PERMISSION);
         }
     }
@@ -904,7 +919,7 @@ public class SurveyAjax extends HttpServlet {
         r.put("time_now", System.currentTimeMillis());
     }
 
-    private JSONArray searchResults(String q, CLDRLocale l) {
+    private JSONArray searchResults(String q, CLDRLocale l) throws JSONException {
         JSONArray results = new JSONArray();
 
         if (q != null) {
@@ -938,21 +953,20 @@ public class SurveyAjax extends HttpServlet {
         }
     }
 
-    private void searchPathheader(JSONArray results, CLDRLocale l, String q) {
+    private void searchPathheader(JSONArray results, CLDRLocale l, String q) throws JSONException {
         if (l == null) {
             return; // don't search with no locale
         }
-        try {
-            PathHeader.PageId page = PathHeader.PageId.valueOf(q);
+        PathHeader.PageId page = PathHeader.PageId.forString(q);
+        if (page != null) {
             results.put(
                     new JSONObject()
                             .put("page", page.name())
                             .put("section", page.getSectionId().name()));
-        } catch (Throwable t) {
-            //
         }
+
         try {
-            PathHeader.SectionId section = PathHeader.SectionId.valueOf(q);
+            PathHeader.SectionId section = PathHeader.SectionId.forString(q);
             results.put(new JSONObject().put("section", section.name()));
         } catch (Throwable t) {
             //
@@ -1087,7 +1101,7 @@ public class SurveyAjax extends HttpServlet {
         }
     }
 
-    private static JSONObject createJSONLocMap(SurveyMain sm) throws JSONException {
+    static JSONObject createJSONLocMap(SurveyMain sm) throws JSONException {
         JSONObject locmap = new JSONObject();
         // locales will have info about each locale, including name
         JSONObject locales = new JSONObject();
@@ -1108,7 +1122,7 @@ public class SurveyAjax extends HttpServlet {
             locale.put("bcp47", loc.toLanguageTag());
 
             HTMLDirection dir = sm.getHTMLDirectionFor(loc);
-            if (!dir.toString().equals("ltr")) {
+            if (dir != HTMLDirection.LEFT_TO_RIGHT) {
                 locale.put("dir", dir);
             }
 
@@ -1399,7 +1413,7 @@ public class SurveyAjax extends HttpServlet {
             oldvotes.put("locale", locale);
             oldvotes.put("localeDisplayName", locale.getDisplayName());
             HTMLDirection dir = sm.getHTMLDirectionFor(locale);
-            oldvotes.put("dir", dir); // e.g., LEFT_TO_RIGHT
+            oldvotes.put("dir", dir); // e.g., "ltr"
             if (isSubmit) {
                 submitOldVotes(user, sm, locale, confirmList, newVotesTable, oldvotes);
             } else {
@@ -1568,7 +1582,7 @@ public class SurveyAjax extends HttpServlet {
         // sort by pathheader
         Arrays.sort(rows, Comparator.comparing(o -> ((PathHeader) o.get("pathHeader"))));
 
-        boolean useWinningVotes = UserRegistry.userIsTC(user);
+        boolean useWinningVotes = UserRegistry.userIsTCOrStronger(user);
 
         /* Some variables are only used if oldvotes != null; otherwise leave them null. */
         JSONArray contested = null; // contested = losing

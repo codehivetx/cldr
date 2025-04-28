@@ -4,8 +4,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
-import com.ibm.icu.dev.test.TestFmwk;
-import com.ibm.icu.dev.test.TestLog;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.RuleBasedCollator;
 import com.ibm.icu.util.VersionInfo;
@@ -22,7 +20,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.unicode.cldr.icu.dev.test.TestFmwk;
+import org.unicode.cldr.icu.dev.test.TestLog;
 import org.unicode.cldr.test.CheckCLDR.Phase;
+import org.unicode.cldr.test.SubmissionLocales;
 
 /**
  * Basic information about the CLDR environment. Use CLDRConfig.getInstance() to create your
@@ -90,6 +91,8 @@ public class CLDRConfig extends Properties {
             if (instance == null) {
                 // this is the "normal" branch for tools and such
                 instance = new CLDRConfig();
+                // attempt to set CLDR_DIR automatically
+                CldrUtility.tryCurrentDirAsCldrDir();
                 CldrUtility.checkValidDirectory(
                         instance.getProperty(CldrUtility.DIR_KEY),
                         "You have to set -DCLDR_DIR=<validdirectory>");
@@ -299,6 +302,7 @@ public class CLDRConfig extends Properties {
         static final Factory SINGLETON = SimpleFactory.make(paths, ".*");
     }
 
+    /** The "full" factory is currently common (previously common and seed) */
     public final Factory getFullCldrFactory() {
         return FullCldrFactoryHelper.SINGLETON;
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
-<!-- Copyright © 1991-2024 Unicode, Inc.
+<!-- Copyright © 1991-2025 Unicode, Inc.
 For terms of use, see http://www.unicode.org/copyright.html
 SPDX-License-Identifier: Unicode-3.0
 CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
@@ -1136,12 +1136,10 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 			<type key="colCaseFirst" type="upper" draft="contributed">Sortiraj prvo velika slova</type>
 			<type key="colCaseLevel" type="no" draft="contributed">Sortiraj bez obzira na velika i mala slova</type>
 			<type key="colCaseLevel" type="yes" draft="contributed">Sortiraj mala i velika slova</type>
-			<type key="collation" type="big5han">tradicionalno kinesko sortiranje</type>
 			<type key="collation" type="compat">prethodni redosled sortiranja, zbog kompatibilnosti</type>
 			<type key="collation" type="dictionary">redosled sortiranja u rečniku</type>
 			<type key="collation" type="ducet">podrazumevani Unicode redosled sortiranja</type>
 			<type key="collation" type="eor" draft="contributed">evropska pravila redosleda</type>
-			<type key="collation" type="gb2312han">pojednostavljeno kinesko sortiranje</type>
 			<type key="collation" type="phonebook">sortiranje kao telefonski imenik</type>
 			<type key="collation" type="phonetic">fonetski redosled sortiranja</type>
 			<type key="collation" type="pinyin">pinjin sortiranje</type>
@@ -3422,6 +3420,9 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 			<regionFormat type="daylight">{0}, letnje vreme</regionFormat>
 			<regionFormat type="standard">{0}, standardno vreme</regionFormat>
 			<fallbackFormat>↑↑↑</fallbackFormat>
+			<zone type="Pacific/Honolulu">
+				<exemplarCity>Honolulu</exemplarCity>
+			</zone>
 			<zone type="Etc/UTC">
 				<long>
 					<standard>Koordinisano univerzalno vreme</standard>
@@ -4037,9 +4038,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<exemplarCity>Pnom Pen</exemplarCity>
 			</zone>
 			<zone type="Pacific/Enderbury">
-				<exemplarCity>Enderberi</exemplarCity>
-			</zone>
-			<zone type="Pacific/Kanton">
 				<exemplarCity>Kanton</exemplarCity>
 			</zone>
 			<zone type="Pacific/Kiritimati">
@@ -4557,9 +4555,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 			</zone>
 			<zone type="America/Nome">
 				<exemplarCity>Nom</exemplarCity>
-			</zone>
-			<zone type="Pacific/Honolulu">
-				<exemplarCity>Honolulu</exemplarCity>
 			</zone>
 			<zone type="America/Anchorage">
 				<exemplarCity>Enkoridž</exemplarCity>
@@ -8386,7 +8381,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="other" case="genitive">↑↑↑</unitPattern>
 				<unitPattern count="other" case="instrumental">↑↑↑</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<gender>feminine</gender>
 				<displayName>čestica na milion</displayName>
 				<unitPattern count="one">{0} čestica na milion</unitPattern>
@@ -10392,7 +10387,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="other" case="genitive">{0} svetala</unitPattern>
 				<unitPattern count="other" case="instrumental">{0} svetala</unitPattern>
 			</unit>
-			<unit type="concentr-portion-per-1e9">
+			<unit type="concentr-part-per-1e9">
 				<gender>inanimate</gender>
 				<displayName>delovi na milijardu</displayName>
 				<unitPattern count="one">{0} deo na milijardu</unitPattern>
@@ -10679,7 +10674,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="few">{0} stavke</unitPattern>
 				<unitPattern count="other">{0} stavki</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<displayName>↑↑↑</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="few">↑↑↑</unitPattern>
@@ -11685,7 +11680,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="few">{0} svetla</unitPattern>
 				<unitPattern count="other">{0} svetala</unitPattern>
 			</unit>
-			<unit type="concentr-portion-per-1e9">
+			<unit type="concentr-part-per-1e9">
 				<displayName>delovi/milijarda</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="few">↑↑↑</unitPattern>
@@ -11952,7 +11947,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="few">↑↑↑</unitPattern>
 				<unitPattern count="other">↑↑↑</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<displayName>↑↑↑</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="few">↑↑↑</unitPattern>
@@ -12958,7 +12953,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="few">{0} svetla</unitPattern>
 				<unitPattern count="other">{0} svetala</unitPattern>
 			</unit>
-			<unit type="concentr-portion-per-1e9">
+			<unit type="concentr-part-per-1e9">
 				<displayName>↑↑↑</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="few">↑↑↑</unitPattern>

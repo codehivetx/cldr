@@ -6,7 +6,8 @@ title: CLDR 46 Release Note
 
 | No. |    Date    | Rel. Note |  Data  |  Charts  | Spec |   Delta  | GitHub Tag | Delta DTD | CLDR JSON |
 |:---:|:----------:|:---------:|:------:|:--------:|:------------:|:---:|:----------:|:---------:|:---------:|
-|  46 | 2024-10-24 | [v46](/index/downloads/cldr-46) | [CLDR46](https://unicode.org/Public/cldr/46/) | [Charts46](https://unicode.org/cldr/charts/46/) | [LDML46](https://www.unicode.org/reports/tr35/tr35-73/tr35.html) | [Δ46](https://unicode-org.atlassian.net/issues/?jql=project+%3D+CLDR+AND+status+%3D+Done+AND+resolution+%3D+Fixed+AND+fixVersion+%3D+%2246%22+ORDER+BY+priority+DESC) | [release-46](https://github.com/unicode-org/cldr/releases/tag/release-46) | [ΔDtd46](https://www.unicode.org/cldr/charts/46/supplemental/dtd_deltas.html) | [46.0.0](https://github.com/unicode-org/cldr-json/releases/tag/46.0.0) |
+|  46 | 2024-10-24 | [v46][] | [CLDR46][] | [Charts46][] | [LDML46][] | [Δ46][]| [release-46][] | [ΔDtd46][] | [46.0.0][] |
+| 46.1 | 2024-12-18 | [v46.1][] | n/a | [Charts46.1][]| [LDML46.1][]| [Δ46.1][] | [release-46-1][] | [ΔDtd46.1][] | [46.1.0][] |
 
 ## Overview
 
@@ -44,9 +45,10 @@ Count | Level | Usage | Examples
 
 For a full listing, see [Coverage Levels](https://unicode.org/cldr/charts/46/supplemental/locale_coverage.html).
 
-## [Specification Changes](https://www.unicode.org/reports/tr35/proposed.html)
 
-The following are the most significant changes to the specification (LDML):
+## Specification Changes
+
+The following are the most significant changes to the [specification (LDML)](https://www.unicode.org/reports/tr35/tr35-73/tr35.html):
 
 1. [Message Format](https://www.unicode.org/reports/tr35/tr35-73/tr35-messageFormat.html#Contents) — see a summary [below](#message-format-specification)
 2. [LDML Conformance](https://www.unicode.org/reports/tr35/tr35-73/tr35.html#Conformance)
@@ -88,7 +90,7 @@ For the reason why, see the algorithm in [Likely Subtags](https://www.unicode.or
     - The regions have been cleaned up: there are no entries with `ZZ`, and `001` is limited to artifical languages such as Interlingua. The only other macroregion code is in `und_419 → es_Latn_419` (Spanish‧Latin‧Latin America)
 5. Macrolanguage mapping / locale canonicalization
    - Parent and defaultContent mappings have been added for Kara-Kalpak (`kaa`) and Konkani (`kok`); defaultContent mappings have been added for Kazakh (`kk`), Ladin (`lld`), Latgalian (`ltg`), Mócheno (`mhn`), and Chinese (Latin, China) (`zh_Latn_CN`).
-   - The predominant language encompassed by "kok" (Konkani macrolanguage) has been changed from "knn" (Konkani / individual language) to "gom" (Goan Konkani) in [CLDR-17121](https://unicode-org.atlassian.net/browse/CLDR-17121)
+   - The predominant language encompassed by "kok" (Konkani macrolanguage) has been changed from "knn" (Konkani / individual language) to "gom" (Goan Konkani) in [CLDR-17121][]
      - The TC found that the predominant encompassed language is "gom" according to local governments and also industry practice; and the CLDR data in the "kok" locale has really been "gom" not "knn".
      - As a result, "knn" no longer canonicalizes to "kok"; instead, "gom" now canonicalizes to "kok".
      - CLDR follows long-standing industry practice in using a macrolanguage subtag instead of the predominant encompassed language. Other examples include the use of "zh" for Mandarin ("cmn") and the use of "ar" for Standard Arabic ("arb").
@@ -280,10 +282,45 @@ These matched the ordering of two legacy character encodings. [CLDR-16062][]
     - The first day of the week for week-of-year calendar calculations.
 1. [CLDR-18056][] “facing right” emojis are missing the skin tone in annotationsDerived
 1. [CLDR-18080][] Han-Latin transform worse due to a change for 著 in Unicode 16
+1. [CLDR-18407][] Unexpected time formatting patterns in Assamese, reverted in [CLDR-18415][] and will be fixed once day period data is validated.
 
 ### Fixed Issues
 
 1. [CLDR-17610][] Updated zip to include LICENSE file following file renaming
+
+## 46.1 Changes
+Version 46.1 is a dot release. The following summarizes the changes. For a full listing, see [Δ46.1](https://unicode-org.atlassian.net/issues/?jql=project+%3D+CLDR+AND+status+%3D+Done+AND+resolution+%3D+Fixed+AND+fixVersion+%3D+%2246.1%22+ORDER+BY+priority+DESC)
+
+### Message Format 2.0
+The main focus is to bring the [Message Format 2.0 specification in Part 9]((https://www.unicode.org/reports/tr35/tr35-74/tr35.html#message-format-modifications)) to Final Candidate status. The following summarizes changes from v46:
+
+* Core Message Format Specification  
+  * Added ‘resolved values’ and ‘function handler’ sections to formatting
+  * Defined “option resolution” and required order of options to be insignificant
+  * Defined “implementation-defined” literal and type values more clearly
+  * Required bidi isolation when u:dir is set and provided for ignoring isolation
+* Default MessageFormat 2.0 function set and Unicode namespace  
+  * Provided normative conditions on function, option, and option-value implementation; specified which functions and options were REQUIRED vs RECOMMENDED
+  * Defined function composition for number, date/time, and string functions 
+  * Added functions: :currency, :math, and :unit (proposed)
+    * :math is to support the MessageFormat 1.0 ‘offset’
+  * Added options to date/time functions: calendar, numberingSystem, hour12, and timezone (proposed)
+  * Add various :u options to the :u namespace
+* General
+  * Provided general clarifications and reorganizations
+  
+There are 3 tech preview implementations available:
+ - ICU4J: Java: [com.ibm.icu.message2](https://unicode-org.github.io/icu-docs/apidoc/dev/icu4j/index.html?com/ibm/icu/message2/package-summary.html), part of ICU 76, is a tech preview implementation of the MessageFormat 2.0, together with a formatting API. See the [ICU User Guide](https://unicode-org.github.io/icu/userguide/format_parse/messages/mf2.html) for examples and a quickstart guide, and [Trying MF 2.0 Final Candidate](https://unicode-org.github.io/icu/userguide/format_parse/messages/try-mf2.html) to try a “Hello World”.
+ - ICU4C: [icu::message2::MessageFormatter](https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/classicu_1_1message2_1_1MessageFormatter.html), part of ICU 76, is a tech preview implementation of MessageFormat 2.0, together with a formatting API. See the [ICU User Guide](https://unicode-org.github.io/icu/userguide/format_parse/messages/mf2.html) for examples and a quickstart guide, and [Trying MF 2.0 Final Candidate](https://unicode-org.github.io/icu/userguide/format_parse/messages/try-mf2.html) to try a “Hello World”.
+ - Javascript: [messageformat](https://github.com/messageformat/messageformat/tree/main/mf2/messageformat) 4.0 provides a formatter and conversion tools for the MessageFormat 2 syntax, together with a polyfill of the runtime API proposed for ECMA-402.
+
+### Other Changes
+Changes aside from Message Format 2.0 include:
+
+ - More explicit well-formedness and validity constraints for unit of measurement identifiers
+ - Addition of derived emoji annotations that were missing: emoji with skin tones facing right
+ - Fixes to make the ja, ko, yue, zh datetimeSkeletons useful for generating the standard patterns
+ - Improved date/time test data
 
 ## Acknowledgments
 
@@ -296,11 +333,34 @@ in particular, see [Exhibit 1](https://unicode.org/copyright.html#Exhibit1).
 
 For web pages with different views of CLDR data, see [http://cldr.unicode.org/index/charts](/index/charts).
 
+
 [CLDR-16062]: https://unicode-org.atlassian.net/browse/CLDR-16062
 [CLDR-16465]: https://unicode-org.atlassian.net/browse/CLDR-16465
 [CLDR-16720]: https://unicode-org.atlassian.net/browse/CLDR-16720
 [CLDR-17095]: https://unicode-org.atlassian.net/browse/CLDR-17095
+[CLDR-17121]: https://unicode-org.atlassian.net/browse/CLDR-17121
 [CLDR-17948]: https://unicode-org.atlassian.net/browse/CLDR-17948
 [CLDR-18056]: https://unicode-org.atlassian.net/browse/CLDR-18056
 [CLDR-17610]: https://unicode-org.atlassian.net/browse/CLDR-17610
 [CLDR-18080]: https://unicode-org.atlassian.net/browse/CLDR-18080
+[CLDR-18407]: https://unicode-org.atlassian.net/browse/CLDR-18407
+[CLDR-18415]: https://unicode-org.atlassian.net/browse/CLDR-18415
+
+<!-- CLDR 46 - 2024-10-24 - Release links-->
+[v46]: /index/downloads/cldr-46
+[CLDR46]: https://unicode.org/Public/cldr/46/
+[Charts46]: https://unicode.org/cldr/charts/46/
+[LDML46]: https://www.unicode.org/reports/tr35/tr35-73/tr35.html
+[Δ46]: https://unicode-org.atlassian.net/issues/?filter=10834
+[release-46]: https://github.com/unicode-org/cldr/releases/tag/release-46
+[ΔDtd46]: https://www.unicode.org/cldr/charts/46/supplemental/dtd_deltas.html
+[46.0.0]: https://github.com/unicode-org/cldr-json/releases/tag/46.0.0
+
+<!-- CLDR 46.1 - 2024-12-18 - Release links-->
+[v46.1]: /index/downloads/cldr-46#461-changes
+[Charts46.1]: https://unicode.org/cldr/charts/46.1/
+[LDML46.1]: https://www.unicode.org/reports/tr35/tr35-74/tr35.html
+[Δ46.1]: https://unicode-org.atlassian.net/issues/?filter=10835
+[release-46-1]: https://github.com/unicode-org/cldr/releases/tag/release-46-1
+[ΔDtd46.1]: https://www.unicode.org/cldr/charts/46.1/supplemental/dtd_deltas.html
+[46.1.0]: https://github.com/unicode-org/cldr-json/releases/tag/46.1.0

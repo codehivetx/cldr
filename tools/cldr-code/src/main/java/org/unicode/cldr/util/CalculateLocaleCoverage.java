@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
-import com.ibm.icu.dev.util.ElapsedTimer;
 import com.ibm.icu.impl.Relation;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
@@ -24,6 +23,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import org.unicode.cldr.icu.dev.util.ElapsedTimer;
 import org.unicode.cldr.tool.LikelySubtags;
 import org.unicode.cldr.tool.ShowLocaleCoverage.StatusCounter;
 import org.unicode.cldr.util.CLDRFile.DraftStatus;
@@ -166,7 +166,7 @@ public class CalculateLocaleCoverage {
 
         logger.info(Joiner.on("\n").join(languageToRegion.asMap().entrySet()));
 
-        logger.info("# Checking: " + availableLanguages);
+        logger.info("# Calculating locale coverage: " + availableLanguages);
 
         NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.ENGLISH);
         percentFormat.setMaximumFractionDigits(1);

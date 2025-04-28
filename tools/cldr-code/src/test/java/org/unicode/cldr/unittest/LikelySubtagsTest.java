@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
-import com.ibm.icu.dev.test.TestFmwk;
 import com.ibm.icu.impl.UnicodeMap;
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.lang.UProperty;
@@ -25,6 +24,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.unicode.cldr.draft.ScriptMetadata;
 import org.unicode.cldr.draft.ScriptMetadata.Info;
+import org.unicode.cldr.icu.dev.test.TestFmwk;
 import org.unicode.cldr.tool.LikelySubtags;
 import org.unicode.cldr.util.CLDRConfig;
 import org.unicode.cldr.util.CLDRFile;
@@ -40,6 +40,7 @@ import org.unicode.cldr.util.Factory;
 import org.unicode.cldr.util.LanguageTagParser;
 import org.unicode.cldr.util.Level;
 import org.unicode.cldr.util.LocaleValidator;
+import org.unicode.cldr.util.NameType;
 import org.unicode.cldr.util.ScriptToExemplars;
 import org.unicode.cldr.util.StandardCodes;
 import org.unicode.cldr.util.StandardCodes.LstrType;
@@ -344,14 +345,14 @@ public class LikelySubtagsTest extends TestFmwk {
             } else {
                 logln("Likely subtags for " + language + ":\t " + likely);
             }
-            String path = CLDRFile.getKey(CLDRFile.LANGUAGE_NAME, language);
+            String path = NameType.LANGUAGE.getKeyPath(language);
             String englishName = english.getStringValue(path);
             if (englishName == null) {
                 Level covLevel = ccl.getEffectiveCoverageLevel(language);
                 if (covLevel == null || !covLevel.isAtLeast(Level.BASIC)) {
-                    // https://unicode-org.atlassian.net/browse/CLDR-15663
+                    // https://unicode-org.atlassian.net/browse/CLDR-17857
                     if (logKnownIssue(
-                            "CLDR-15663",
+                            "CLDR-17857",
                             "English translation should not be required for sub-basic language name")) {
                         continue; // skip error
                     }
@@ -375,19 +376,22 @@ public class LikelySubtagsTest extends TestFmwk {
                                 "Missing likely subtags for region: "
                                         + region
                                         + "\t"
-                                        + english.getName("territory", region));
+                                        + english.nameGetter()
+                                                .getNameFromTypeEnumCode(
+                                                        NameType.TERRITORY, region));
                     }
                 } else { // container
                     logln(
                             "Missing likely subtags for macroregion (fix to exclude regions having 'en'): "
                                     + region
                                     + "\t"
-                                    + english.getName("territory", region));
+                                    + english.nameGetter()
+                                            .getNameFromTypeEnumCode(NameType.TERRITORY, region));
                 }
             } else {
                 logln("Likely subtags for region: " + region + ":\t " + likely);
             }
-            String path = CLDRFile.getKey(CLDRFile.TERRITORY_NAME, region);
+            String path = NameType.TERRITORY.getKeyPath(region);
             String englishName = english.getStringValue(path);
             if (englishName == null) {
                 errln("Missing English translation for: " + region);
@@ -395,10 +399,8 @@ public class LikelySubtagsTest extends TestFmwk {
         }
     }
 
-    // typically historical script that don't need to  be in likely subtags
-
-    static final Set<String> KNOWN_SCRIPTS_WITHOUT_LIKELY_SUBTAGS =
-            ImmutableSet.of("Hatr", "Cpmn", "Ougr");
+    // These historical scripts don't have a language with an ISO tag (as of 2025-04-11)
+    static final Set<String> KNOWN_SCRIPTS_WITHOUT_LIKELY_SUBTAGS = ImmutableSet.of("Cpmn", "Nshu");
 
     public void TestMissingInfoForScript() {
         VersionInfo icuUnicodeVersion = UCharacter.getUnicodeVersion();
@@ -411,19 +413,7 @@ public class LikelySubtagsTest extends TestFmwk {
                 // we minimize away und_X, when the code puts in en...US
                 continue;
             }
-            // Temporary exception for CLDR 46 Unicode 16 (CLDR-17226) because
-            // GenerateMaximalLocales is currently not usable.
-            if (script.equals("Aghb")) {
-                // The script metadata for Aghb=Caucasian_Albanian changed
-                // the likely region from Russia to Azerbaijan, and
-                // the likely language from udi=Udi to xag=Old Udi.
-                // Error: likelySubtags.xml has wrong language for script (und_Aghb).
-                // Should not be udi_Aghb_RU, but Script Metadata suggests something like:
-                // {"und_Aghb", "xag_Aghb_AZ"},
-                continue;
-            }
             Info i = ScriptMetadata.getInfo(script);
-            // System.out.println(i);
             String likelyLanguage = i.likelyLanguage;
             String originCountry = i.originCountry;
             String undScript = "und_" + script;
@@ -446,15 +436,6 @@ public class LikelySubtagsTest extends TestFmwk {
                 }
             } else if (!exceptions2.contains(likelyExpansion)
                     && !likelyExpansion.startsWith(langScript)) {
-                // if
-                // (logKnownIssue("Cldrbug:7181","Missing script metadata for "
-                // + script)
-                // && (script.equals("Tfng") || script.equals("Brah"))) {
-                // logln("Wrong likely language for script (und_" + script +
-                // "). Should not be " + likelyExpansion
-                // + ", but something like:\t " + showOverride(script,
-                // originCountry, langScript));
-                // } else {
                 errln(
                         "likelySubtags.xml has wrong language for script (und_"
                                 + script
@@ -467,10 +448,6 @@ public class LikelySubtagsTest extends TestFmwk {
                 logln("OK: " + undScript + " => " + likelyExpansion);
             }
         }
-        /**
-         * und_Bopo => zh_Bopo_TW und_Copt => cop_Copt_EG // fix 002 und_Dsrt => en_Dsrt_US // fix
-         * US
-         */
     }
 
     public String showOverride(String script, String originCountry, String langScript) {
@@ -756,10 +733,7 @@ public class LikelySubtagsTest extends TestFmwk {
         //        System.out.println("\t\t" + Joiner.on("\n\t\t").join(possibleFixes));
     }
 
-    private static final Joiner JOIN_LS = Joiner.on(CldrUtility.LINE_SEPARATOR);
-
     public void testToAttributeValidityStatus() {
-        Multimap<String, String> badFieldsToLocales = TreeMultimap.create();
         for (String s : likely.values()) {
             LanguageTagParser ltp = new LanguageTagParser().set(s);
             Set<String> errors = new LinkedHashSet<>();

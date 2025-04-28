@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
-<!-- Copyright © 1991-2024 Unicode, Inc.
+<!-- Copyright © 1991-2025 Unicode, Inc.
 For terms of use, see http://www.unicode.org/copyright.html
 SPDX-License-Identifier: Unicode-3.0
 CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
@@ -2628,7 +2628,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 			<zone type="Asia/Phnom_Penh">
 				<exemplarCity>ܦܢܘܡ ܦܢ</exemplarCity>
 			</zone>
-			<zone type="Pacific/Kanton">
+			<zone type="Pacific/Enderbury">
 				<exemplarCity>ܟܐܢܬܘܢ</exemplarCity>
 			</zone>
 			<zone type="Pacific/Kiritimati">
@@ -3665,9 +3665,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<long>
 					<standard>ܥܕܢܐ ܕܓܪܝܢܟ</standard>
 				</long>
-				<short>
-					<standard>↑↑↑</standard>
-				</short>
 			</metazone>
 			<metazone type="Greenland_Eastern">
 				<long>
@@ -4402,13 +4399,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 		<symbols numberSystem="vaii">
 			<timeSeparator draft="unconfirmed">↑↑↑</timeSeparator>
 		</symbols>
-		<decimalFormats>
-			<decimalFormatLength>
-				<decimalFormat>
-					<pattern draft="unconfirmed">#,##0.###;#,##0.###-</pattern>
-				</decimalFormat>
-			</decimalFormatLength>
-		</decimalFormats>
 		<decimalFormats numberSystem="latn">
 			<decimalFormatLength>
 				<decimalFormat>
@@ -4430,13 +4420,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				</percentFormat>
 			</percentFormatLength>
 		</percentFormats>
-		<currencyFormats>
-			<currencyFormatLength>
-				<currencyFormat type="standard">
-					<pattern draft="unconfirmed">¤ #,##0.00;¤ #,##0.00-</pattern>
-				</currencyFormat>
-			</currencyFormatLength>
-		</currencyFormats>
 		<currencyFormats numberSystem="latn">
 			<currencyFormatLength>
 				<currencyFormat type="standard">
@@ -4685,7 +4668,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="one">ܚܕ ܡܠܘܐܐ</unitPattern>
 				<unitPattern count="other">↑↑↑</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<displayName>ܡܢܘ̈ܬܐ ܒܡܠܝܘܢ</displayName>
 				<unitPattern count="one">{0} ܡܢܬܐ ܒܡܠܝܘܢ</unitPattern>
 				<unitPattern count="other">{0} ܡܢܘ̈ܬܐ ܒܡܠܝܘܢ</unitPattern>
@@ -5728,7 +5711,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="one">ܡܠܘܐܐ</unitPattern>
 				<unitPattern count="other">{0} ܡܠܘܐ̈ܐ</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<displayName>↑↑↑</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="other">↑↑↑</unitPattern>
@@ -6771,7 +6754,7 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="other">↑↑↑</unitPattern>
 			</unit>
-			<unit type="concentr-permillion">
+			<unit type="concentr-part-per-1e6">
 				<displayName>↑↑↑</displayName>
 				<unitPattern count="one">↑↑↑</unitPattern>
 				<unitPattern count="other">↑↑↑</unitPattern>
@@ -7817,7 +7800,6 @@ CLDR data files are interpreted according to the LDML specification (http://unic
 			<nameField type="given">ܫܪܘܟܝܢܐ ܢܝܢܘܬܐ</nameField>
 			<nameField type="given-informal">ܫܪܘ</nameField>
 			<nameField type="given2">ܘܪܕܐ</nameField>
-			<nameField type="surname-prefix">↑↑↑</nameField>
 			<nameField type="surname-core">ܒܝܬ ܝܘܐܝܠ</nameField>
 			<nameField type="generation">ܒܪܐ ܙܥܘܪܐ</nameField>
 			<nameField type="credentials">ܐܝܙܓܕܐ</nameField>

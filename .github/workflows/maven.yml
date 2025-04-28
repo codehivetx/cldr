@@ -1,5 +1,10 @@
 name: cldr-mvn
 
+env:
+  ## uncomment only ONE of these
+  # CLDR_CHECK_MODE: FINAL_TESTING
+  CLDR_CHECK_MODE: BUILD
+
 on:
   push:
   pull_request:
@@ -40,6 +45,21 @@ jobs:
             ${{ runner.os }}-mavenspotless-
       - name: Check Java style
         run: mvn --file=tools/pom.xml spotless:check || (echo "Style checker failed. Formatting changes can be applied by 'mvn spotless:apply'" && exit 1)
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+      - name: Run lychee on PathDescriptions.md
+        uses: lycheeverse/lychee-action@v1
+        with:
+            args: "-n --cache --max-cache-age 10d tools/cldr-code/src/main/resources/org/unicode/cldr/util/data/PathDescriptions.md"
+            fail: true
+            format: markdown
+            output: linkcheck.md
+      - name: Link Checker Summary PathDescriptions.md
+        run: cat linkcheck.md >> $GITHUB_STEP_SUMMARY
   build:
     runs-on: ubuntu-latest
     steps:
@@ -100,6 +120,8 @@ jobs:
       - name: Checkout CLDR archive
         run: >
           mkdir -v ../cldr-archive && java -jar tools/cldr-code/target/cldr-code.jar checkout-archive
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
       - name: Build liberty server
         run: >
           mvn -s .github/workflows/mvn-settings.xml -B  -pl cldr-apps liberty:create liberty:deploy liberty:package -Dinclude=usr --file tools/pom.xml
@@ -194,7 +216,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: run CLDR console check
-        run: java -DCLDR_GITHUB_ANNOTATIONS=true -DCLDR_DIR=$(pwd) -Xmx6g -jar tools/cldr-code/target/cldr-code.jar check -S common,seed -e -z FINAL_TESTING
+        run: java -DCLDR_GITHUB_ANNOTATIONS=true -DCLDR_DIR=$(pwd) -Xmx6g -jar tools/cldr-code/target/cldr-code.jar check -S common,seed -e -z ${CLDR_CHECK_MODE}
   deploy:
     # don't run deploy on manual builds!
     if: github.repository == 'unicode-org/cldr' && github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.inputs.git-ref == ''

@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import org.unicode.cldr.tool.LikelySubtags;
 
 /**
  * This class implements a CLDR UTS#35 compliant locale. It differs from ICU and Java locales in
@@ -31,7 +32,7 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
 
         String getDisplayName(
                 CLDRLocale cldrLocale,
-                boolean onlyConstructCompound,
+                NameGetter.NameOpt nameOpt,
                 Transform<String, String> altPicker);
 
         String getDisplayLanguage(CLDRLocale cldrLocale);
@@ -113,7 +114,7 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
         @Override
         public String getDisplayName(
                 CLDRLocale cldrLocale,
-                boolean onlyConstructCompound,
+                NameGetter.NameOpt nameOpt,
                 Transform<String, String> altPicker) {
             return getDisplayName(cldrLocale);
         }
@@ -151,42 +152,56 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
 
         @Override
         public String getDisplayVariant(CLDRLocale cldrLocale) {
-            if (file != null) return file.getName("variant", cldrLocale.getVariant());
+            if (file != null)
+                return file.nameGetter()
+                        .getNameFromTypeEnumCode(NameType.VARIANT, cldrLocale.getVariant());
             return tryForBetter(super.getDisplayVariant(cldrLocale), cldrLocale.getVariant());
         }
 
         @Override
         public String getDisplayName(CLDRLocale cldrLocale) {
-            if (file != null) return file.getName(cldrLocale.toDisplayLanguageTag(), true, null);
+            if (file != null)
+                return file.nameGetter()
+                        .getNameFromIdentifierOptAlt(
+                                cldrLocale.toDisplayLanguageTag(),
+                                NameGetter.NameOpt.COMPOUND_ONLY,
+                                null);
             return super.getDisplayName(cldrLocale);
         }
 
         @Override
         public String getDisplayName(
                 CLDRLocale cldrLocale,
-                boolean onlyConstructCompound,
+                NameGetter.NameOpt nameOpt,
                 Transform<String, String> altPicker) {
             if (file != null)
-                return file.getName(
-                        cldrLocale.toDisplayLanguageTag(), onlyConstructCompound, altPicker);
+                return file.nameGetter()
+                        .getNameFromIdentifierOptAlt(
+                                cldrLocale.toDisplayLanguageTag(), nameOpt, altPicker);
             return super.getDisplayName(cldrLocale);
         }
 
         @Override
         public String getDisplayScript(CLDRLocale cldrLocale) {
-            if (file != null) return file.getName("script", cldrLocale.getScript());
+            if (file != null)
+                return file.nameGetter()
+                        .getNameFromTypeEnumCode(NameType.SCRIPT, cldrLocale.getScript());
             return tryForBetter(super.getDisplayScript(cldrLocale), cldrLocale.getScript());
         }
 
         @Override
         public String getDisplayLanguage(CLDRLocale cldrLocale) {
-            if (file != null) return file.getName("language", cldrLocale.getLanguage());
+            if (file != null)
+                return file.nameGetter()
+                        .getNameFromTypeEnumCode(NameType.LANGUAGE, cldrLocale.getLanguage());
             return tryForBetter(super.getDisplayLanguage(cldrLocale), cldrLocale.getLanguage());
         }
 
         @Override
         public String getDisplayCountry(CLDRLocale cldrLocale) {
-            if (file != null) return file.getName("territory", cldrLocale.getCountry());
+            if (file != null)
+                return file.nameGetter()
+                        .getNameFromTypeEnumCode(NameType.TERRITORY, cldrLocale.getCountry());
             return tryForBetter(super.getDisplayLanguage(cldrLocale), cldrLocale.getLanguage());
         }
 
@@ -544,8 +559,8 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
         return getDisplayVariant(getDefaultFormatter());
     }
 
-    public String getDisplayName(boolean combined, Transform<String, String> picker) {
-        return getDisplayName(getDefaultFormatter(), combined, picker);
+    public String getDisplayName(NameGetter.NameOpt nameOpt, Transform<String, String> picker) {
+        return getDisplayName(getDefaultFormatter(), nameOpt, picker);
     }
 
     /**
@@ -646,8 +661,8 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
     }
 
     public String getDisplayName(
-            NameFormatter engFormat, boolean combined, Transform<String, String> picker) {
-        return engFormat.getDisplayName(this, combined, picker);
+            NameFormatter engFormat, NameGetter.NameOpt nameOpt, Transform<String, String> picker) {
+        return engFormat.getDisplayName(this, nameOpt, picker);
     }
 
     /**
@@ -693,5 +708,16 @@ public final class CLDRLocale implements Comparable<CLDRLocale> {
 
     public String getRegion() {
         return getCountry();
+    }
+
+    private String getMaximalLocaleString() {
+        return new LikelySubtags().maximize(getBaseName());
+    }
+
+    /** get the maximized version of this locale or null if not set */
+    public CLDRLocale getMaximal() {
+        final String max = getMaximalLocaleString();
+        if (max == null) return null;
+        return getInstance(max);
     }
 }

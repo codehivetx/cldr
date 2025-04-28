@@ -8,7 +8,6 @@ package org.unicode.cldr.tool;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.ibm.icu.dev.util.UOption;
 import com.ibm.icu.impl.Utility;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.DateTimePatternGenerator;
@@ -39,6 +38,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.unicode.cldr.draft.FileUtilities;
+import org.unicode.cldr.icu.dev.util.UOption;
 import org.unicode.cldr.test.CLDRTest;
 import org.unicode.cldr.test.CoverageLevel2;
 import org.unicode.cldr.test.DisplayAndInputProcessor;
@@ -651,7 +651,7 @@ public class CLDRModify {
                             + "Use -? for help.");
         }
         if (i == FIX && givenOptions.value != null) {
-            final UnicodeSet allowedFilters = new UnicodeSet().add('P').add('k').add('E');
+            final UnicodeSet allowedFilters = new UnicodeSet().add('P').add('k').add('E').add('m');
             for (char c : givenOptions.value.toCharArray()) {
                 if (!allowedFilters.contains(c)) {
                     throw new IllegalArgumentException(
@@ -1629,6 +1629,22 @@ public class CLDRModify {
                                 String fullXPath = cldrFileToFilter.getFullXPath(xpath);
                                 replace(fullXPath, fullXPath, preValue);
                             }
+                        }
+                    }
+                });
+
+        // Remove inheritance marker if there is no value to inherit
+        fixList.add(
+                'm',
+                "Remove inheritance from missing (null) value",
+                new CLDRFilter() {
+                    @Override
+                    public void handlePath(String xpath) {
+                        String value = cldrFileToFilter.getStringValue(xpath);
+                        if (CldrUtility.INHERITANCE_MARKER.equals(value)
+                                && getResolved().getStringValue(xpath) == null) {
+                            String fullXPath = cldrFileToFilter.getFullXPath(xpath);
+                            remove(fullXPath, "would inherit from missing value");
                         }
                     }
                 });

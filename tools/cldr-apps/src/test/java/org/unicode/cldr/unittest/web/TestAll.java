@@ -5,12 +5,12 @@ package org.unicode.cldr.unittest.web;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.ibm.icu.dev.test.TestFmwk.TestGroup;
-import com.ibm.icu.dev.test.TestLog;
 import java.io.File;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import org.unicode.cldr.icu.dev.test.TestFmwk.TestGroup;
+import org.unicode.cldr.icu.dev.test.TestLog;
 import org.unicode.cldr.test.CheckCLDR;
 import org.unicode.cldr.util.CLDRConfig;
 import org.unicode.cldr.util.CLDRConfig.Environment;
@@ -73,22 +73,22 @@ public class TestAll extends TestGroup {
                 "Error: variable " + var + " " + err + ", please set -D" + var + sugg);
     }
 
+    /** This is the entrypoint from the command line */
     public static void main(String[] args) {
-        main(args, null);
-        /* NOTREACHED */
+        if (main(args, null) != 0) {
+            System.exit(1);
+        }
     }
 
+    /** This is the entrypoint from JUnit */
     public static int main(String[] args, PrintWriter logs) {
+        /** Setup stuff */
         CheckCLDR.setDisplayInformation(CLDRConfig.getInstance().getEnglish());
         args = TestAll.doResetDb(args);
+
+        /** boilerplate */
         TestAll test = new TestAll();
-        if (logs != null) {
-            return test.run(args, logs);
-        } else {
-            test.run(args);
-            /* NOTREACHED */
-            return -1; // does not actually return
-        }
+        return test.run(args, logs);
     }
 
     public static String[] doResetDb(String[] args) {
@@ -106,7 +106,7 @@ public class TestAll extends TestGroup {
                     // removals (if not additions)
                     TestIntHash.class.getName(),
                     TestXPathTable.class.getName(),
-                    TestMisc.class.getName(),
+                    TestMiscWeb.class.getName(),
                     TestUserSettingsData.class.getName(),
                     TestAnnotationVotes.class.getName(),
                     TestUserRegistry.class.getName(),

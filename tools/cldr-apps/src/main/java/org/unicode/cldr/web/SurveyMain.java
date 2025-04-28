@@ -7,7 +7,6 @@
 package org.unicode.cldr.web;
 
 import com.google.common.base.Suppliers;
-import com.ibm.icu.dev.util.ElapsedTimer;
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.text.ListFormatter;
 import com.ibm.icu.text.UnicodeSet;
@@ -56,10 +55,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONString;
 import org.unicode.cldr.draft.FileUtilities;
+import org.unicode.cldr.icu.dev.util.ElapsedTimer;
 import org.unicode.cldr.test.CheckCLDR;
 import org.unicode.cldr.test.ExampleGenerator;
 import org.unicode.cldr.test.HelpMessages;
@@ -92,6 +89,9 @@ import org.unicode.cldr.util.TimeDiff;
 import org.unicode.cldr.web.UserRegistry.User;
 import org.unicode.cldr.web.WebContext.HTMLDirection;
 import org.unicode.cldr.web.api.Summary;
+import org.unicode.cldr.web.util.JSONException;
+import org.unicode.cldr.web.util.JSONObject;
+import org.unicode.cldr.web.util.JSONString;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -503,7 +503,7 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
                 freeMem(pages, xpages);
             }
         }
-        com.ibm.icu.dev.util.ElapsedTimer reqTimer = new com.ibm.icu.dev.util.ElapsedTimer();
+        ElapsedTimer reqTimer = new ElapsedTimer();
 
         /*
          * Busted: unrecoverable error, do not attempt to go on.
@@ -1082,7 +1082,7 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
             try {
                 int i, j;
 
-                com.ibm.icu.dev.util.ElapsedTimer et = new com.ibm.icu.dev.util.ElapsedTimer();
+                ElapsedTimer et = new ElapsedTimer();
 
                 conn = dbUtils.getDBConnection();
                 s = conn.createStatement();
@@ -3730,7 +3730,7 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
                     .put("sysload", sysload)
                     .put("memtotal", memtotal)
                     .put("memfree", memfree)
-                    .put("uptime", uptime)
+                    .put("uptime", uptime.toString())
                     .put("user", user) // allowed since User implements JSONString?
                     .put("users", users);
         }

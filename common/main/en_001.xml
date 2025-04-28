@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE ldml SYSTEM "../../common/dtd/ldml.dtd">
-<!-- Copyright © 1991-2024 Unicode, Inc.
+<!-- Copyright © 1991-2025 Unicode, Inc.
 For terms of use, see http://www.unicode.org/copyright.html
 SPDX-License-Identifier: Unicode-3.0
 CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
@@ -815,33 +815,27 @@ Warnings: All cp values have U+FE0F characters removed. See /annotationsDerived/
 			</field>
 		</fields>
 		<timeZoneNames>
-			<zone type="America/St_Barthelemy">
-				<exemplarCity>St Barthélemy</exemplarCity>
-			</zone>
-			<zone type="America/St_Johns">
-				<exemplarCity>St John’s</exemplarCity>
-			</zone>
-			<zone type="Pacific/Enderbury">
-				<exemplarCity>Enderbury</exemplarCity>
-			</zone>
-			<zone type="America/St_Kitts">
-				<exemplarCity>St Kitts</exemplarCity>
-			</zone>
-			<zone type="Asia/Aqtau">
-				<exemplarCity>Aktau</exemplarCity>
-			</zone>
-			<zone type="America/St_Lucia">
-				<exemplarCity>St Lucia</exemplarCity>
-			</zone>
-			<zone type="Atlantic/St_Helena">
-				<exemplarCity>St Helena</exemplarCity>
-			</zone>
 			<zone type="Pacific/Honolulu">
 				<short>
 					<generic>∅∅∅</generic>
 					<standard>∅∅∅</standard>
 					<daylight>∅∅∅</daylight>
 				</short>
+			</zone>
+			<zone type="America/St_Barthelemy">
+				<exemplarCity>St Barthélemy</exemplarCity>
+			</zone>
+			<zone type="America/St_Johns">
+				<exemplarCity>St John’s</exemplarCity>
+			</zone>
+			<zone type="America/St_Kitts">
+				<exemplarCity>St Kitts</exemplarCity>
+			</zone>
+			<zone type="America/St_Lucia">
+				<exemplarCity>St Lucia</exemplarCity>
+			</zone>
+			<zone type="Atlantic/St_Helena">
+				<exemplarCity>St Helena</exemplarCity>
 			</zone>
 			<zone type="America/St_Vincent">
 				<exemplarCity>St Vincent</exemplarCity>

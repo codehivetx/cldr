@@ -84,6 +84,7 @@ public class CLDRFileTransformer {
     // en_NZ("en_AU", "null", Transliterator.FORWARD, "[]", PolicyIfExisting.DISCARD),
     // Needs work to fix currency symbols, handle Māori. See
     // http://unicode.org/cldr/trac/ticket/9516#comment:6
+        suz("suz_Sunu", "Sunuwar-Devanagari.xml", Transliterator.FORWARD, "[:script=Sunu:]",PolicyIfExisting.RETAIN)
     ;
 
         private final String inputLocale;

@@ -8,7 +8,7 @@ For terms of use, see http://www.unicode.org/copyright.html
 <supplementalData>
 	<version number="$Revision$"/>
 	<transforms>
-		<transform source="InterIndic" target="Sunu" variant="SWS" direction="forward" draft="contributed" visibility="internal">
+		<transform source="InterIndic" target="Sunu" direction="forward" visibility="internal">
 			<tRule><![CDATA[
 ########################################################################
 # Sunuwar Welfare Society System

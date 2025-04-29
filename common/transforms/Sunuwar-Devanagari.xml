@@ -8,12 +8,12 @@ For terms of use, see http://www.unicode.org/copyright.html
 <supplementalData>
 	<version number="$Revision$"/>
 	<transforms>
-		<transform source="Deva" target="Sunu" variant="SWS" direction="forward" draft="contributed" alias="deva-t-sunu-sws">
-					<tRule><![CDATA[
-::[ँ-ःऄअ-ह़-्ॐ-॔क़-९ॽ];
+		<transform source="Sunu" target="Deva" direction="forward" alias="und-Sunu-t-und-Deva">			
+			<tRule><![CDATA[
+::[𑯀-𑯹\uE04D\uE064\u0303\u0300\u0301\u030D.:];
 ::NFD;
-::Devanagari-InterIndic;
-::InterIndic-Sunuwar_SWS;
+::Sunuwar-InterIndic;
+::InterIndic-Devanagari;
 ::NFC;
 			]]></tRule>
 		</transform>

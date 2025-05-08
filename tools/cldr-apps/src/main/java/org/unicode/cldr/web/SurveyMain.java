@@ -2301,7 +2301,7 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
             if (pageId != null && !which.equals(xMAIN)) {
                 showPathList(subCtx);
             } else {
-                doMain(subCtx); // TODO: does this ever happen? Or is doMain effectively dead code?
+                doMain(subCtx); // If the user accidentally stumbles here, redirect
             }
         }
     }
@@ -2319,7 +2319,8 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
 
     /** Show the 'main info about this locale' (General) panel. */
     private void doMain(WebContext ctx) {
-        ctx.includeFragment("generalinfo.jsp");
+        System.err.println("Obsolete SurveyMain.doMain() called, redirecting");
+        ctx.redirect(ctx.context());
     }
 
     private static ExampleGenerator gComparisonValuesExample = null;

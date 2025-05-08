@@ -1747,17 +1747,7 @@ public class SurveyMain extends HttpServlet implements CLDRProgressIndicator, Ex
         ctx.setSession();
 
         if (ctx.session == null) {
-
-            printHeader(ctx, "Survey Tool");
-            if (ctx.getSessionMessage() == null) {
-                ctx.setSessionMessage("Could not create your user session.");
-            }
-            ctx.println("<p><img src='stop.png' width='16'>" + ctx.getSessionMessage() + "</p>");
-            ctx.println(
-                    "<hr><a href='"
-                            + ctx.context("login.jsp")
-                            + "' class='notselected'>Login as another user...</a>");
-            printFooter(ctx);
+            ctx.redirect("v#"); // No ST interface available for
             return;
         } else {
             ctx.session.userDidAction(); // always true for this

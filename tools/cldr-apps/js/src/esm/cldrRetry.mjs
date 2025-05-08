@@ -19,7 +19,7 @@ let errInfo = {};
  */
 function handleDisconnect(why, json, word, what) {
   if (json && json.err_code === "E_NOT_LOGGED_IN") {
-    window.location.href = "login.jsp?operationFailed" + window.location.hash;
+    window.location.href = "v#" + window.location.hash;
     return;
   }
   if (!what) {

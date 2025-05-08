@@ -153,7 +153,7 @@ public class SurveyTool extends HttpServlet {
         out.write(
                 "  <a href='"
                         + request.getContextPath()
-                        + "/login.jsp'"
+                        + "/'"
                         + " id='loginlink' class='notselected'>Login…</a>\n");
         out.write("</div>\n");
         out.write("<h2>CLDR Survey Tool | Problem</h2>\n");

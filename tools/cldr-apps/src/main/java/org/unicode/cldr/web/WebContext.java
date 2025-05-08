@@ -19,7 +19,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -1005,8 +1004,14 @@ public class WebContext implements Cloneable, Appendable {
     public static void includeFragment(
             HttpServletRequest request, HttpServletResponse response, String filename)
             throws ServletException, IOException {
-        RequestDispatcher dp = request.getRequestDispatcher(TMPL_PATH + filename);
-        dp.include(request, response);
+        // for tracing
+        // throw new UnsupportedOperationException("It's " +
+        // Calendar.getInstance().get(Calendar.YEAR) + " - JSP is not supported.");
+        System.err.println(
+                "TODO CLDR-18341 Not printing fragment: "
+                        + filename
+                        + " for "
+                        + request.getRequestURI());
     }
 
     /**

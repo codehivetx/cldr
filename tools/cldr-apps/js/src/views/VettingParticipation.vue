@@ -1,14 +1,17 @@
 <template>
   <div>
-    <a-spin size="large" v-if="loading && !participationData">
-      <p>This will take a long time.</p>
-    </a-spin>
-    <button @click="fetchData" v-if="!loading && !participationData">
-      Load Data (slow)
-    </button>
-    <div v-if="localeTxt">
-      <h2>Locales.txt (generated)</h2>
-      <textarea rows="66" cols="160" v-model="localeTxt" />
+    <div v-if="surveyUser?.userlevelName == 'ADMIN'">
+      <h3>Admin: Locales.txt check</h3>
+      <a-spin size="large" v-if="loading && !participationData">
+        <p>This will take a long time.</p>
+      </a-spin>
+      <button @click="fetchData" v-if="!loading && !participationData">
+        Load Data (slow)
+      </button>
+      <div v-if="localeTxt">
+        <h2>Locales.txt (generated)</h2>
+        <textarea rows="66" cols="160" v-model="localeTxt" />
+      </div>
     </div>
   </div>
 </template>
@@ -25,6 +28,7 @@ export default {
       loading: ref(null),
       localeTxt: ref(null),
       participationData: ref(null),
+      surveyUser: cldrStatus.refs.surveyUser,
     };
   },
   // Note: note loading fetchData()  on create() due to slowness

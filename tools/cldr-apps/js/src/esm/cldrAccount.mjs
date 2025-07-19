@@ -10,6 +10,8 @@ import * as cldrStatus from "./cldrStatus.mjs";
 import * as cldrSurvey from "./cldrSurvey.mjs";
 import * as cldrText from "./cldrText.mjs";
 import * as cldrUserLevels from "./cldrUserLevels.mjs";
+import * as cldrXlsx from "./cldrXlsx.mjs";
+import * as XLSX from "xlsx";
 
 const CLDR_ACCOUNT_DEBUG = false;
 const SHOW_GRAVATAR = !CLDR_ACCOUNT_DEBUG;
@@ -221,6 +223,130 @@ function reallyReallyLoad() {
   cldrAjax.sendXhr(xhrArgs);
 }
 
+/**
+ *
+ * @param {Element} statusDiv empty div for status
+ * @param {Object} json
+ */
+function downloadUsersSpreadsheet(statusDiv, json) {
+  cldrDom.removeAllChildNodes(statusDiv);
+  const status = cldrDom.createChunk(
+    cldrText.get("loading"),
+    "div",
+    "statusbox"
+  );
+  statusDiv.appendChild(status);
+  try {
+    const COLUMNS = [
+      "ID",
+      "USERLEVEL",
+      "NAME",
+      "EMAIL",
+      "ORG",
+      "LOCALES",
+      "BADLOCS",
+      "INTLOCS",
+      "LASTLOGIN",
+    ];
+
+    const ws_data = [
+      COLUMNS,
+
+      ...json.shownUsers.map(
+        ({
+          active,
+          email,
+          id,
+          intlocs,
+          lastlogin,
+          userlevelName,
+          locales,
+          name,
+          org,
+          seen,
+          badLocales,
+        }) => {
+          // start with empty row to make sure we don't miss any columns
+          const r = COLUMNS.map(() => "");
+          const setCol = (n, v) => (r[cldrXlsx.findCol(COLUMNS, n)] = v);
+
+          setCol("ID", id);
+          setCol("NAME", name);
+          setCol("EMAIL", email);
+          setCol("USERLEVEL", userlevelName);
+          setCol("ORG", org);
+          setCol("LOCALES", locales);
+          setCol("BADLOCS", badLocales.join(" ")); // this one is an array
+          setCol("INTLOCS", intlocs);
+          if (lastlogin) {
+            setCol("LASTLOGIN", new Date(lastlogin));
+          }
+
+          return r;
+        }
+      ), // sort?
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    // add comments
+    function pushHeaderComment(h, t) {
+      cldrXlsx.pushComment(ws, { r: 0, c: cldrXlsx.findCol(COLUMNS, h) }, t);
+    }
+    pushHeaderComment("ID", "user id");
+    pushHeaderComment("BADLOCS", "Disallowed locales on this user");
+    pushHeaderComment("INTLOCS", "Interest Locales");
+    pushHeaderComment("LASTLOGIN", "Date of Last Login");
+
+    // fixup locale cells to be string format
+    const loc_columns = [
+      cldrXlsx.findCol(COLUMNS, "BADLOCS"),
+      cldrXlsx.findCol(COLUMNS, "INTLOCS"),
+      cldrXlsx.findCol(COLUMNS, "LOCALES"),
+    ];
+    for (let i = 0; i < json.shownUsers.length; i++) {
+      for (const c of loc_columns) {
+        const loc = XLSX.utils.encode_cell({ r: i + 1, c });
+        if (ws[loc]) {
+          // if cell is there
+          ws[loc].t = "s";
+        }
+      }
+    }
+
+    const ws_name = "AccountSettings";
+    XLSX.utils.book_append_sheet(wb, ws, ws_name);
+    XLSX.writeFile(wb, `${ws_name}.xlsx`);
+
+    status.textContent = "Downloaded.";
+  } catch (e) {
+    status.textContent = `Err: ${e}`;
+    status.className = `ferrbox`;
+    throw e;
+  }
+}
+
+/**
+ * the download button just downloads what's visible, so there's
+ * no reason to restrict it.
+ * @param {Element} ourDiv parent div to add to
+ * @param {Object} json data blob
+ */
+function addDownloadButton(ourDiv, json) {
+  const button = cldrDom.createChunk(
+    cldrText.get("downloadXlsxLink"),
+    "button",
+    ""
+  );
+  const statusDiv = document.createElement("div");
+  cldrDom.listenFor(button, "click", () =>
+    downloadUsersSpreadsheet(statusDiv, json)
+  );
+  ourDiv.appendChild(button);
+  ourDiv.appendChild(statusDiv);
+}
+
 function loadHandler(json) {
   const ourDiv = document.createElement("div");
   if (json.err) {
@@ -235,6 +361,7 @@ function loadHandler(json) {
       justUser = shownUsers[0].email;
     }
     ourDiv.innerHTML = getHtml(json);
+    addDownloadButton(ourDiv, json);
   }
   cldrSurvey.hideLoader();
   cldrLoad.flipToOtherDiv(ourDiv);
@@ -281,7 +408,6 @@ function getHtml(json) {
   }
   html += getTable(json);
   html += getInterestLocalesHtml(json);
-  html += getDownloadCsvForm(json);
   if (json.exception) {
     html += "<p><i>Failure: " + json.exception + "</i></p>\n";
   }
@@ -1293,24 +1419,6 @@ function getUserActivityLink(u) {
     "<a class='recentActivity' href='v#recent_activity///" +
     u.data.id +
     "'>User Activity</a>"
-  );
-}
-
-// cf. cldrRecentActivity.getDownloadMyVotesForm
-function getDownloadCsvForm(json) {
-  if (isJustMe || !json.userPerms || !json.userPerms.canModifyUsers) {
-    return "";
-  }
-  // TODO: not jsp; see https://unicode-org.atlassian.net/browse/CLDR-14475
-  return (
-    "<hr />\n" +
-    "<form method='POST' action='DataExport.jsp'>\n" +
-    "  <input type='hidden' name='s' value='" +
-    cldrStatus.getSessionId() +
-    "' />\n" +
-    "  <input type='hidden' name='do' value='list' />\n" +
-    "  <input type='submit' class='csvDownload' value='Download .csv (including LOCKED)' />\n" +
-    "</form>\n"
   );
 }
 

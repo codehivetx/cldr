@@ -141,6 +141,7 @@ const strings = {
   recentCount: "Count",
   downloadXmlLink: "Download XML...",
   downloadCsvLink: "Download CSV...",
+  downloadXlsxLink: "Download XLSX...",
 
   testOkay: "has no errors or warnings",
   testWarn: "has warnings",

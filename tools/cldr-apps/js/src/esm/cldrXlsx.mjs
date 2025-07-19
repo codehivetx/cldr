@@ -14,4 +14,14 @@ function pushComment(ws, where, t) {
   ws[where].c.push({ a: "SurveyTool", t });
 }
 
-export { pushComment };
+/** just findIndex with a throw
+ * @param {string[]} COLUMNS column head array
+ * @param {string} name column name
+ */
+function findCol(COLUMNS, name) {
+  const i = COLUMNS.indexOf(name);
+  if (i == -1) throw Error(`Could not find column ${name}`);
+  return i;
+}
+
+export { pushComment, findCol };

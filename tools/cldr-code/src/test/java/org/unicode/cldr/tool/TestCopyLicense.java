@@ -33,9 +33,9 @@ public class TestCopyLicense {
             fail("Could not read " + CopyLicense.RESOURCE_PATH + " - " + HELP, t);
             return;
         }
-        assertArrayEquals(
-                rootLicense.split("\n"),
-                resourceLicense.split("\n"),
-                () -> "License mismatch - " + HELP);
+
+        final String[] rootLines = rootLicense.split("[\r\n]+");
+        final String[] resLines = resourceLicense.split("[\r\n]+");
+        assertArrayEquals(rootLines, resLines, () -> "License mismatch - " + HELP);
     }
 }

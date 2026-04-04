@@ -1,0 +1,22 @@
+services:
+  jekyll:
+    build: assets/docker/jekyll.d
+    command: jekyll build -s /src -d /_site --watch
+    volumes:
+      - ../_site-tmp:/src:rw
+      - ../_site/:/_site:rw
+    environment:
+      - PAGES_REPO_NWO=unicode-org/cldr
+  sitebuild:
+    build:
+      context: .
+      dockerfile: assets/docker/sitebuild.d/Dockerfile
+    volumes:
+      - .:/site:rw
+      - ../_site-tmp:/_site-tmp:rw
+  wrangler:
+    build: assets/docker/serve.d/
+    volumes:
+      - ../../../../docs/_site-tmp:/_site:ro
+    ports:
+    - 4000:4000

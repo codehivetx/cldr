@@ -223,6 +223,7 @@ async function buildAll() {
 
 /** top level async */
 async function main(argv) {
+  console.log('cwd=' + process.cwd());
   let useWatch = false;
   if (argv[0] === "--watch") {
     useWatch = true;

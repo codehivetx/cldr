@@ -30,12 +30,12 @@ export function dropmd(p) {
 
 /** @param {string} p URL */
 export function isSiteRelativeLink(p) {
-  return (p.startsWith('/'));
+  return p.startsWith("/");
 }
 
 /** @param {string} p URL */
 export function isExternalLink(p) {
-  return (/^(http|https):/.test(p));
+  return /^(http|https):/.test(p);
 }
 
 /** @param {string} p URL */
@@ -43,14 +43,18 @@ export function isRelativeLink(p) {
   return !isExternalLink(p);
 }
 
-/** @param {string} p URL */
+/**
+ * not external and not site relative
+ * (so it's a relative link but ./abc or abc/ but not /abc )
+ * @param {string} p URL
+ */
 export function isNonSiteRelativeLink(p) {
-  return !isExternalLink(p) && ! !isSiteRelativeLink(p);
+  return !isExternalLink(p) && !isSiteRelativeLink(p);
 }
 
 /** @param {string} p URL */
 export function isMarkdownLink(p) {
-  return (p.endsWith('.md'));
+  return p.endsWith(".md");
 }
 
 /** @param {string} p URL */
@@ -58,6 +62,13 @@ export function isMarkdownAndNotSiteRelative(p) {
   return isMarkdownLink(p) && isNonSiteRelativeLink(p);
 }
 
+/** @returns Promise<true> if p + .md exists */
+export function isLinkToMarkdownWithoutSuffix(p) {
+  return fs
+    .access(p + ".md", fs.constants.R_OK)
+    .then(() => true)
+    .catch(() => false);
+}
 
 /**
  *
@@ -71,7 +82,6 @@ export function tabs(n) {
   }
   return s.join("");
 }
-
 
 /**
  * Directory Crawler: process one dirent
@@ -107,10 +117,10 @@ export async function traverse(d, out, fn, skipDirs) {
 }
 
 export async function mkdirNoisily(dirPath) {
-    const createDir = await fs.mkdir(dirPath, { recursive: true });
-    if (createDir && !SKIP_THESE.test(dirPath)) {
-        console.log(`# mkdir ${createDir}`);
-    }
+  const createDir = await fs.mkdir(dirPath, { recursive: true });
+  if (createDir && !SKIP_THESE.test(dirPath)) {
+    console.log(`# mkdir ${createDir}`);
+  }
 }
 
 export async function dstIsNewer(srcPath, dstPath) {

@@ -33,3 +33,4 @@ exception.log
 derby.log
 .lycheecache
 /linkcheck.md
+/.wrangler

@@ -4,6 +4,7 @@ import {
   isLinkToMarkdownWithoutSuffix,
   isSiteRelativeLink,
   isNonSiteRelativeLink,
+  isPageLink,
 } from "./utils.mjs";
 
 describe("util functions", function () {
@@ -19,6 +20,7 @@ describe("util functions", function () {
       "translation/example-hidden.png": false,
       "/translation/example-hidden.png": true,
       "https://example.com": false,
+      "mailto:user@example.com": false,
     })) {
       it(`Should return ${expect} for ${p}`, () => {
         assert.equal(isSiteRelativeLink(p), expect);
@@ -57,6 +59,18 @@ describe("util functions", function () {
     })) {
       it(`Should return ${expect} for ${p}`, async () => {
         assert.equal(await isNonSiteRelativeLink(p), expect);
+      });
+    }
+  });
+  describe("#isPageLink", function () {
+    for (const [p, expect] of Object.entries({
+      index: false,
+      "index#something": false,
+      "#something": true,
+      "https://example.com#other": false,
+    })) {
+      it(`Should return ${expect} for ${p}`, async () => {
+        assert.equal(await isPageLink(p), expect);
       });
     }
   });

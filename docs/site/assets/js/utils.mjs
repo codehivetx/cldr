@@ -35,12 +35,16 @@ export function isSiteRelativeLink(p) {
 
 /** @param {string} p URL */
 export function isExternalLink(p) {
-  return /^(http|https):/.test(p);
+  return /^(http|https|mailto|ftp):/.test(p);
 }
 
 /** @param {string} p URL */
 export function isRelativeLink(p) {
   return !isExternalLink(p);
+}
+
+export function isPageLink(p) {
+  return p.startsWith("#");
 }
 
 /**

@@ -11,13 +11,15 @@ import {
   isExternalLink,
   isMarkdownLink,
   SKIP_THESE,
+  isPageLink,
   isRelativeLink,
 } from "./utils.mjs";
 import { marked } from "marked";
 // import { link } from "node:fs";
 
 /** rerender a token in markdown, flattening its tokens */
-function renderAndFlatten(t) {
+function renderAndFlatten(t)
+{
   if (t.tokens) {
     t.text = flattenTokens(t.tokens);
     t.tokens = [];
@@ -26,6 +28,13 @@ function renderAndFlatten(t) {
     return `[${t.text}](${t.href})`;
   } else if (t.type === "image") {
     return `![${t.text}](${t.href})`;
+  } else if (t.type === "list_item") {
+    if (!t.item_prefix) {
+        throw Error(`Need item_prefix for ${t.raw}`);
+    }
+    return t.item_prefix + t.text + t.item_suffix;
+  } else if (t.type === 'list') {
+    return flattenTokens(t.items);
   } else {
     throw Error(`Can't rerender type ${t.type}`);
   }
@@ -36,19 +45,44 @@ function renderAndFlatten(t) {
  * @param {Object[]} srcTokens array of source tokens
  * @returns true if any fix was needed
  */
-function fixTokens(srcTokens, o) {
+async function fixTokens(srcTokens, o) {
   const { srcPath } = o;
   const parentPath = path.dirname(srcPath); // foo/bar/baz.md => foo/bar
   // were any children fixed?
   let didFix = false;
   for (let i in srcTokens) {
     const t = srcTokens[i];
-    const { type, raw, text, href, tokens } = t;
-    if (type === "link" || type === "image") {
-      if (t.raw.indexOf("example-hidden") !== -1) {
-        console.dir(t);
-      }
+    const { type, raw, text, href, tokens, items } = t;
 
+    // store these off so that renderAndFlatten knows what the prefix/suffix were
+      if (t.type === 'list_item') {
+          const prefixLen = t.raw.indexOf(t.text);
+          if (prefixLen === -1) {
+            // throw Error(`Could not find prefix for ${t.raw}`);
+            t.item_prefix = undefined;
+            t.item_suffix = undefined;
+          } else {
+            t.item_prefix = t.raw.substring(0, prefixLen);
+            if (t.raw.endsWith('\n')) {
+                t.item_suffix = '\n';
+            } else {
+                t.item_suffix = '';
+            }
+        }
+    }
+
+    if(t.raw.indexOf('Understand the basics') !== -1) {
+        console.dir(t);
+    }
+
+    // if (raw && raw.indexOf('Survey Tool Guide') !== -1) {
+    //     console.dir(t);
+    // }
+        if (href === 'translation/getting-started/guide.md') {
+            console.dir({t});
+        }
+
+    if (type === "link" || type === "image") {
       // TODO: lint here CLDR-18011
       // if (isSiteRelativeLink(href)) {
       //     throw Error(`Err! Site Relative Link ${href}, use relative link to .md file instead`);
@@ -67,7 +101,8 @@ function fixTokens(srcTokens, o) {
         t.raw = renderAndFlatten(t);
       } else if (
         isNonSiteRelativeLink(href) &&
-        !isLinkToMarkdownWithoutSuffix(href)
+        !isPageLink(href) &&
+        !(await isLinkToMarkdownWithoutSuffix(href))
       ) {
         // links to png etc
         const oldHref = t.href;
@@ -80,9 +115,16 @@ function fixTokens(srcTokens, o) {
         // we aren't processing subtokens here, however, they should not be needed,
         // since t.raw remains valid
       }
-    } else if (fixTokens(tokens, o)) {
+    } else if (type === 'list') {
+        if(await fixTokens(items, o)) {
+            didFix = true;
+            t.raw = renderAndFlatten(t);
+        }
+    } else if (await fixTokens(tokens, o)) {
       didFix = true; // so parents get re-rendered
-      if (type === "paragraph" || type === "em" || type === "strong") {
+      if (type === 'list_item') {
+        t.raw = renderAndFlatten(t);
+      } else if (type === "paragraph" || type === "em" || type === "strong" || type === 'text') {
         delete t.raw; // recombine this paragraph
       } else {
         throw Error(
@@ -127,9 +169,13 @@ function flattenTokens(srcTokens) {
 async function linkFix(srcPath, dstPath) {
   const str = (await fs.readFile(srcPath, "utf-8")).replaceAll(/\r\n/g, "\n");
 
-  const tokens = marked.lexer(str);
+    const tokens = marked.lexer(str);
 
-  const didFix = fixTokens(tokens, {
+    if (srcPath === 'translation.md') {
+        console.dir(tokens, {depth: Infinity});
+    }
+
+    const didFix = await fixTokens(tokens, {
     srcPath,
   });
 

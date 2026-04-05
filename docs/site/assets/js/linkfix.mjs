@@ -18,8 +18,7 @@ import { marked } from "marked";
 // import { link } from "node:fs";
 
 /** rerender a token in markdown, flattening its tokens */
-function renderAndFlatten(t)
-{
+function renderAndFlatten(t) {
   if (t.tokens) {
     t.text = flattenTokens(t.tokens);
     t.tokens = [];
@@ -30,10 +29,10 @@ function renderAndFlatten(t)
     return `![${t.text}](${t.href})`;
   } else if (t.type === "list_item") {
     if (!t.item_prefix) {
-        throw Error(`Need item_prefix for ${t.raw}`);
+      throw Error(`Need item_prefix for ${t.raw}`);
     }
     return t.item_prefix + t.text + t.item_suffix;
-  } else if (t.type === 'list') {
+  } else if (t.type === "list") {
     return flattenTokens(t.items);
   } else {
     throw Error(`Can't rerender type ${t.type}`);
@@ -55,32 +54,32 @@ async function fixTokens(srcTokens, o) {
     const { type, raw, text, href, tokens, items } = t;
 
     // store these off so that renderAndFlatten knows what the prefix/suffix were
-      if (t.type === 'list_item') {
-          const prefixLen = t.raw.indexOf(t.text);
-          if (prefixLen === -1) {
-            // throw Error(`Could not find prefix for ${t.raw}`);
-            t.item_prefix = undefined;
-            t.item_suffix = undefined;
-          } else {
-            t.item_prefix = t.raw.substring(0, prefixLen);
-            if (t.raw.endsWith('\n')) {
-                t.item_suffix = '\n';
-            } else {
-                t.item_suffix = '';
-            }
+    if (t.type === "list_item") {
+      const prefixLen = t.raw.indexOf(t.text);
+      if (prefixLen === -1) {
+        // throw Error(`Could not find prefix for ${t.raw}`);
+        t.item_prefix = undefined;
+        t.item_suffix = undefined;
+      } else {
+        t.item_prefix = t.raw.substring(0, prefixLen);
+        if (t.raw.endsWith("\n")) {
+          t.item_suffix = "\n";
+        } else {
+          t.item_suffix = "";
         }
+      }
     }
 
-    if(t.raw.indexOf('Understand the basics') !== -1) {
-        console.dir(t);
-    }
+    // if(t?.raw && t.raw.indexOf('Understand the basics') !== -1) {
+    //     console.dir(t);
+    // }
 
     // if (raw && raw.indexOf('Survey Tool Guide') !== -1) {
     //     console.dir(t);
     // }
-        if (href === 'translation/getting-started/guide.md') {
-            console.dir({t});
-        }
+    // if (href === 'translation/getting-started/guide.md') {
+    //     console.dir({t});
+    // }
 
     if (type === "link" || type === "image") {
       // TODO: lint here CLDR-18011
@@ -99,32 +98,26 @@ async function fixTokens(srcTokens, o) {
         // confirm the sub-tokens situation and rerender
         didFix = true; // so that the parent re-renders
         t.raw = renderAndFlatten(t);
-      } else if (
-        isNonSiteRelativeLink(href) &&
-        !isPageLink(href) &&
-        !(await isLinkToMarkdownWithoutSuffix(href))
-      ) {
-        // links to png etc
-        const oldHref = t.href;
-        t.href = path.join("/", parentPath, href); // convert to site relative.
-        // confirm the sub-tokens situation and rerender
-        didFix = true; // so that the parent re-renders
-        t.raw = renderAndFlatten(t);
       } else {
         // no fixup needed for this link.
         // we aren't processing subtokens here, however, they should not be needed,
         // since t.raw remains valid
       }
-    } else if (type === 'list') {
-        if(await fixTokens(items, o)) {
-            didFix = true;
-            t.raw = renderAndFlatten(t);
-        }
+    } else if (type === "list") {
+      if (await fixTokens(items, o)) {
+        didFix = true;
+        t.raw = renderAndFlatten(t);
+      }
     } else if (await fixTokens(tokens, o)) {
       didFix = true; // so parents get re-rendered
-      if (type === 'list_item') {
+      if (type === "list_item") {
         t.raw = renderAndFlatten(t);
-      } else if (type === "paragraph" || type === "em" || type === "strong" || type === 'text') {
+      } else if (
+        type === "paragraph" ||
+        type === "em" ||
+        type === "strong" ||
+        type === "text"
+      ) {
         delete t.raw; // recombine this paragraph
       } else {
         throw Error(
@@ -169,13 +162,13 @@ function flattenTokens(srcTokens) {
 async function linkFix(srcPath, dstPath) {
   const str = (await fs.readFile(srcPath, "utf-8")).replaceAll(/\r\n/g, "\n");
 
-    const tokens = marked.lexer(str);
+  const tokens = marked.lexer(str);
 
-    if (srcPath === 'translation.md') {
-        console.dir(tokens, {depth: Infinity});
-    }
+  // if (srcPath === 'translation.md') {
+  //     console.dir(tokens, {depth: Infinity});
+  // }
 
-    const didFix = await fixTokens(tokens, {
+  const didFix = await fixTokens(tokens, {
     srcPath,
   });
 

@@ -7,10 +7,11 @@ See <https://cldr.unicode.org/development/updating-site> for more details about 
 This is the recommended mechanism
 
 1. install https://docker.io
-2. `docker compose up`
-3. visit <http://127.0.0.1:4000>
-4. hit control-C to cancel the docker run.
-5. (on Windows, you may need to restart the container to pickup changes)
+2. `cd docs/site`
+3. `docker compose up`
+4. visit <http://127.0.0.1:4000>
+5. hit control-C to cancel the docker run.
+6. (on Windows, you may need to restart the container to pickup changes)
 
 ## Manually running the site build
 
@@ -23,8 +24,8 @@ This is a prerequisite, and `build` needs to re-run if the sitemap changes.
 
 ### Building the static site
 
-1. `docker compose run -w /src site jekyll build`
-2. output is in `./_site` here in this dir.
+1. In `docs/site` run `jekyll build` (will need prereqs. see build-site.sh)
+2. output is in `../../_site` here in this dir.
 
 ## Production Build
 
